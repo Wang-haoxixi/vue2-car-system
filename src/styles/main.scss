@@ -1,0 +1,26 @@
+@import "./normalize.scss";
+@import "./config.scss";
+@import "./elementui.scss";
+
+.pull-left {
+  float: left;
+}
+.pull-right {
+  float: right;
+}
+
+.clearfloat:after {
+  display: block;
+  clear: both;
+  content: "";
+  visibility: hidden;
+  height: 0;
+}
+
+.overflow-h {
+  overflow: hidden;
+}
+
+.padding-top-20{
+  padding-top: 20px;
+}

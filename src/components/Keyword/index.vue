@@ -1,0 +1,62 @@
+<template>
+  <el-row :gutter="10">
+    <el-col :span="9">
+      <el-select v-model="searchKey" placeholder="请选择关键字" @change="input">
+        <el-option v-for="(item, index) in searchOptions" :key="index" :label="item.label" :value="item.value"></el-option>
+      </el-select>
+    </el-col>
+    <el-col :span="15">
+      <el-input v-model="searchVal" placeholder="请输入关键字" @input="input"></el-input>
+    </el-col>
+  </el-row>
+</template>
+
+<script>
+export default {
+  props: {
+    options: {
+      type: Array,
+      default: () => [],
+    }
+  },
+  created() {
+    this.initOptions()
+  },
+  data() {
+    return {
+      searchKey: "",
+      searchVal: "",
+      keywordOptions: this.$store.state.config.keywordOptions,
+      searchOptions: [],
+    }
+  },
+  methods: {
+    initOptions() {
+      let optionsItem = [];
+      this.options.forEach(item => {
+        let data = this.keywordOptions.filter(ele => ele.value == item);
+        optionsItem = optionsItem.concat(data)
+      });
+      this.searchOptions = optionsItem;
+    },
+    // 输入内容时触发
+    input(val) {
+      // console.log(val)
+      const keyword = {};
+      keyword.key = this.searchKey;
+      keyword.val = this.searchVal;
+      // 反向修改外面的数据
+      this.$emit('update:keyword', keyword);
+    },
+    // 重置
+    clear() {
+      this.searchKey = "";
+      this.searchVal = "";
+      this.input();
+    }
+  }
+}
+</script>
+
+<style lang="scss" scoped>
+</style>

@@ -1,4 +1,5 @@
-console.log("develop...")
+console.log(111111)
+console.log("我再次修改")
 const path = require('path');
 console.log("env: ", process.env.NODE_ENV, process.env.VUE_APP_API);
 module.exports = {

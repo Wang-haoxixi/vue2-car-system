@@ -1,11 +1,37 @@
 const path = require('path');
+console.log("env: ", process.env.NODE_ENV, process.env.VUE_APP_API);
 module.exports = {
   // 基本路径
+  // 部署生产环境和开发环境下的URL。
+  // 默认情况下，Vue CLI 会假设你的应用是被部署在一个域名的根路径上
+  // 例如 https://www.ruoyi.vip/。如果应用被部署在一个子路径上，你就需要用这个选项指定这个子路径。例如，如果你的应用被部署在 https://www.ruoyi.vip/admin/，则设置 baseUrl 为 /admin/。
   publicPath: process.env.NODE_ENV === 'production' ? '' : '/',
-  // 输出文件目录
-  outputDir: process.env.NODE_ENV === 'production' ? 'dist' : 'devdist',
-  // eslint-loader 是否在保存的时候检查
+  // 输出文件目录 (// 在npm run build 或 yarn build 时 ，生成文件的目录名称（要和baseUrl的生产环境路径一致）（默认dist）)
+  outputDir: process.env.NODE_ENV === 'production' ? 'production_dist' : 'test_dist',
+  // 是否开启eslint保存检测，有效值：ture | false | 'error'
   lintOnSave: false,
+  // 生产环境是否生成 sourceMap 文件, 如果你不需要生产环境的 source map，可以将其设置为 false 以加速生产环境构建。
+  productionSourceMap: false,
+  // 在生产构建中使用babel & TS线程加载器 
+  // 如果机器有超过1个核，则默认启用 
+  parallel: require('os').cpus().length > 1,
+  /**
+   * css相关配置
+   */
+  css: {
+    // 是否使用css分离插件 ExtractTextPlugin
+    extract: true,
+    // 开启 CSS source maps?
+    sourceMap: false,
+    // css预设器配置项
+    loaderOptions: {
+      scss: {
+        prependData: `@import "./src/styles/main.scss";`
+      }
+    },
+    // 启用 CSS modules for all css / pre-processor files.
+    // modules: false
+  },
   /**
    * webpack配置,see https://github.com/vuejs/vue-cli/blob/dev/docs/webpack.md
    **/
@@ -20,8 +46,11 @@ module.exports = {
         include: ["./src/icons"]
       });
   },
+  /**
+   * 配置解析别名
+   */
   configureWebpack: (config) => {
-    config.resolve = { // 配置解析别名
+    config.resolve = {
       extensions: ['.js', '.json', '.vue'],
       alias: {
         'vue': "vue/dist/vue.js",
@@ -30,32 +59,13 @@ module.exports = {
       }
     }
   },
-  // 生产环境是否生成 sourceMap 文件
-  productionSourceMap: false,
-  // css相关配置
-  css: {
-    // 是否使用css分离插件 ExtractTextPlugin
-    extract: true,
-    // 开启 CSS source maps?
-    sourceMap: false,
-    // css预设器配置项
-    loaderOptions: {
-      // 如发现 css.modules 报错，请查看这里：http://www.web-jshtml.cn/#/detailed?id=12
-      scss: {
-        prependData: `@import "./src/styles/main.scss";`
-      }
-    },
-    // 启用 CSS modules for all css / pre-processor files.
-    // modules: false
-  },
-  // use thread-loader for babel & TS in production build
-  // enabled by default if the machine has more than 1 cores
-  parallel: require('os').cpus().length > 1,
   /**
    *  PWA 插件相关配置,see https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-pwa
    */
   pwa: {},
-  // webpack-dev-server 相关配置
+  /**
+   * webpack-dev-server 相关配置
+   */
   devServer: {
     open: false, // 编译完成是否打开网页
     host: '0.0.0.0', // 指定使用地址，默认localhost,0.0.0.0代表可以被外界访问

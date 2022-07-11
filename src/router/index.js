@@ -148,6 +148,14 @@ export const defaultRouterMap = [  // 暴露出去 ,然后到permission store模
           name: "新增车辆",
         },
       },
+      {
+        path: "/attr",
+        name: "Attr",
+        component: () => import("../views/Cars/attrList.vue"),
+        meta: {
+          name: "车辆属性",
+        },
+      },
     ]
   },
 

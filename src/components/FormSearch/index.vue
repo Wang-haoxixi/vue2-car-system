@@ -21,7 +21,8 @@
 
         <!-- 关键字 -->
         <template v-if="item.type === 'Keyworad'">
-          <Keyword ref="keyword" :options="['parkingName', 'address']" :keyword.sync="keyword" />
+          <!-- <Keyword ref="keyword" :options="['parkingName', 'address']" :keyword.sync="keyword" /> -->
+          <Keyword ref="keyword" :options="item.options" :keyword.sync="keyword" />
         </template>
 
         <!-- Radio -->
@@ -47,133 +48,133 @@
 </template>
 
 <script>
-import CityArea from "@/components/CityArea"
-// keyword
-import Keyword from "@/components/Keyword"
-export default {
-  name: "Form",
-  components: { CityArea, Keyword },
-  props: {
-    // 表单项配置
-    formItems: {
-      type: Array,
-      default: () => []
-    },
-    // 重置按钮
-    otherConfig: {
-      type: Object,
-      default: () => { }
-    },
-    // 新增等其他按钮
-    formHandler: {
-      type: Array,
-      default: () => [],
-    },
-  },
-  data() {
-    return {
-      // 关键字
-      keyword: {},
-      // 绑定数据项
-      formFelids: {},
-      // 区域数据
-      areaData: "",
-    }
-  },
-  methods: {
-    // 初始化表单数据
-    initFormData() {
-      const form = {};
-      this.formItems.forEach(item => {
-        // 表单校验 rules
-        if (item.required) {
-          this.rules(item);
-        }
-        // 自定义检验规则
-        if (item.validator) {
-          item.rules = item.validator;
-        }
-        // 读取下拉选项数据
-        if (item.type === "Select") {
-          this.setSelectOption(item);
-        }
-      });
-    },
-    // 表单校验 rules
-    rules(item) {
-      let typeMsgJson = {
-        "Input": "请输入",
-        "Radio": "请选择",
-        "Select": "请选择"
-      }
-      // 第一步： 判断表单项是否必填
-      let requiredRules = [{ required: true, message: item.requiredMsg || typeMsgJson[item.type] + item.label, trigger: 'change' }];
-      // 第二步： 判断是否有其他校验规则
-      if (item.rules && item.rules.length > 0) {
-        item.rules = requiredRules.concat(item.rules);
-      } else {
-        item.rules = requiredRules;
-      }
-    },
-    setSelectOption(item) {
-      const options = this.$store.state.config[item.options];
-      if (options) {
-        item.options = options;
-      }
-    },
-    initFormFelid() {
-      const felids = {};
-      this.formItems.forEach(item => {
-        if (item.prop) {
-          felids[item.prop] = "";
-        }
-      })
-      this.formFelids = felids;
-      // console.log(this.formFelids)
-    },
-    search() {
-      const searchParams = {};
-      // 过滤空字段
-      for (let key in this.formFelids) {
-        if (this.formFelids[key]) {
-          searchParams[key] = this.formFelids[key];
-        }
-      }
-      // 关键字设置
-      if (this.$refs.keyword && this.keyword.key && this.keyword.val) {
-        searchParams[this.keyword.key] = this.keyword.val;
-      }
-      // 城市设置
-      if (this.$refs.cityArea && this.areaData) {
-        searchParams.area = this.areaData;
-      }
-      // console.log(searchParams)
-      this.$emit("search", searchParams)
-    },
-    // 重置
-    reset() {
-      this.$refs.WFormRef.resetFields();
-      if (this.$refs.cityArea) {
-        this.$refs.cityArea[0].clear();
-      }
-      if (this.$refs.keyword) {
-        this.$refs.keyword[0].clear();
-      }
-    }
-  },
-  watch: {
-    // 监听formItems的变化,用于表单数据绑定
-    formItems: {
-      handler(newVal) {
-        // console.log(newVal);
-        this.initFormData();
-        // 双向绑定字段初始化
-        this.initFormFelid();
+  import CityArea from "@/components/CityArea"
+  // keyword
+  import Keyword from "@/components/Keyword"
+  export default {
+    name: "Form",
+    components: { CityArea, Keyword },
+    props: {
+      // 表单项配置
+      formItems: {
+        type: Array,
+        default: () => []
       },
-      immediate: true,
+      // 重置按钮
+      otherConfig: {
+        type: Object,
+        default: () => {}
+      },
+      // 新增等其他按钮
+      formHandler: {
+        type: Array,
+        default: () => [],
+      },
+    },
+    data () {
+      return {
+        // 关键字
+        keyword: {},
+        // 绑定数据项
+        formFelids: {},
+        // 区域数据
+        areaData: "",
+      }
+    },
+    methods: {
+      // 初始化表单数据
+      initFormData () {
+        const form = {};
+        this.formItems.forEach(item => {
+          // 表单校验 rules
+          if (item.required) {
+            this.rules(item);
+          }
+          // 自定义检验规则
+          if (item.validator) {
+            item.rules = item.validator;
+          }
+          // 读取下拉选项数据
+          if (item.type === "Select") {
+            this.setSelectOption(item);
+          }
+        });
+      },
+      // 表单校验 rules
+      rules (item) {
+        let typeMsgJson = {
+          "Input": "请输入",
+          "Radio": "请选择",
+          "Select": "请选择"
+        }
+        // 第一步： 判断表单项是否必填
+        let requiredRules = [{ required: true, message: item.requiredMsg || typeMsgJson[item.type] + item.label, trigger: 'change' }];
+        // 第二步： 判断是否有其他校验规则
+        if (item.rules && item.rules.length > 0) {
+          item.rules = requiredRules.concat(item.rules);
+        } else {
+          item.rules = requiredRules;
+        }
+      },
+      setSelectOption (item) {
+        const options = this.$store.state.config[item.options];
+        if (options) {
+          item.options = options;
+        }
+      },
+      initFormFelid () {
+        const felids = {};
+        this.formItems.forEach(item => {
+          if (item.prop) {
+            felids[item.prop] = "";
+          }
+        })
+        this.formFelids = felids;
+        // console.log(this.formFelids)
+      },
+      search () {
+        const searchParams = {};
+        // 过滤空字段
+        for (let key in this.formFelids) {
+          if (this.formFelids[key]) {
+            searchParams[key] = this.formFelids[key];
+          }
+        }
+        // 关键字设置
+        if (this.$refs.keyword && this.keyword.key && this.keyword.val) {
+          searchParams[this.keyword.key] = this.keyword.val;
+        }
+        // 城市设置
+        if (this.$refs.cityArea && this.areaData) {
+          searchParams.area = this.areaData;
+        }
+        console.log("searchParams", searchParams);
+        this.$emit("search", searchParams)
+      },
+      // 重置
+      reset () {
+        this.$refs.WFormRef.resetFields();
+        if (this.$refs.cityArea) {
+          this.$refs.cityArea[0].clear();
+        }
+        if (this.$refs.keyword) {
+          this.$refs.keyword[0].clear();
+        }
+      }
+    },
+    watch: {
+      // 监听formItems的变化,用于表单数据绑定
+      formItems: {
+        handler (newVal) {
+          // console.log(newVal);
+          this.initFormData();
+          // 双向绑定字段初始化
+          this.initFormFelid();
+        },
+        immediate: true,
+      }
     }
   }
-}
 </script>
 
 <style lang="scss" scoped>

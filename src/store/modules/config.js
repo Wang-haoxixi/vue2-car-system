@@ -1,3 +1,10 @@
+/*
+ * @Description: 
+ * @Author: wanghao
+ * @Date: 2022-05-16 23:02:20
+ * @LastEditors: 
+ * @LastEditTime: 2022-07-11 22:21:12
+ */
 
 const state = {
     // 停车场类型
@@ -25,6 +32,8 @@ const state = {
     keywordOptions: [
         { label: '停车场名称', value: 'parkingName' },
         { label: '详细区域', value: 'address' },
+        { label: '字段', value: 'key' },
+        { label: '文本', value: 'value' },
     ]
 }
 const getters = {

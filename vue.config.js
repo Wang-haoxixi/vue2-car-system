@@ -1,6 +1,4 @@
-console.log(111111)
 const path = require('path');
-console.log("env: ", process.env.NODE_ENV, process.env.VUE_APP_API);
 module.exports = {
   // 基本路径
   // 部署生产环境和开发环境下的URL。

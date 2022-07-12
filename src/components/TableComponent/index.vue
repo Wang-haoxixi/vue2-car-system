@@ -1,6 +1,17 @@
+<!--
+ * @Description: 表格组件(附带搜索功能)
+ *  表格加载的代码流程如下流程：
+ *  1、侦听传进来的表格配置变化
+ *  2、初始化表格配置
+ *  3、通过isRequest判断表格是否进行加载，用于后续业务逻辑扩展
+ * @Author: wh
+ * @Date: 2022-06-22 09:08:23
+ * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2022-07-12 14:05:26
+-->
 <template>
   <div>
-    <!-- 搜索表单 -->
+    <!-- 搜索表单组件 -->
     <FormSearch ref="carAddRef" v-if="tableConfig.showSearchForm" :formItems="tableConfig.formItems" @search="search" :otherConfig="tableConfig.otherConfig || {}" :formHandler="tableConfig.formHandler" />
 
     <slot name="attrsList"></slot>
@@ -54,22 +65,19 @@
 <script>
   import FormSearch from "@/components/FormSearch"
   import { GetTableData } from "@/api/common"
-  import { ParkingList } from "@/api/parking"
   export default {
     name: "TableComponent",
+
     components: { FormSearch },
+
     props: {
-      // 搜索配置
-      // searchFormConfig: {
-      //   type: Object,
-      //   default: () => ({})
-      // },
       // 表格数据配置
       config: {
         type: Object,
         default: () => ({})
       },
     },
+
     data () {
       return {
         // 加载提示
@@ -79,8 +87,8 @@
         // 表格数据配置
         tableConfig: {
           aa: 111,
-          // 是否加载表格
-          isRequest: false,
+          // 是否加载表格(默认true加载)
+          isRequest: true,
           // 是否显示表格搜索
           showSearchForm: true,
           // 抬头项
@@ -94,8 +102,11 @@
           // 请求参数
           params: {},
 
+          // 搜索表单配置
           formItems: [],
+          // 搜索按钮右边的其他配置项
           otherConfig: {},
+          // 新增等其他按钮
           formHandler: [],
         },
         currentPage: 1,
@@ -103,45 +114,55 @@
         total: 0,
       }
     },
+
     watch: {
+      /**
+       * 表格加载的代码流程如下流程：
+       * 1、侦听传进来的表格配置变化
+       */
       config: {
         handler (newVal) {
-          // console.log(newVal)
+          /**
+           * 2、初始化表格配置
+           */
           this.initConfig();
         },
         immediate: true,
       }
     },
-    created () {
-      // this.getParkingList()
-    },
+
     methods: {
       // 搜索
       search (data) {
         let searchParams = data;
         searchParams.pageNumber = 1;
         searchParams.pageSize = 10;
+        // 刷新表格数据
         this.refreshTableData(searchParams);
       },
+
       // 初始化表格配置
       initConfig () {
         // 循环判断传进来的每项是否在本文件中有配置，并进行赋值
         for (const key in this.config) {
+          // 先提取本文件中数据的key组成数组，再进行包含判断
           if (Object.keys(this.tableConfig).includes(key)) {
             this.tableConfig[key] = this.config[key]
           }
         }
-
-        // console.log(this.tableConfig)
+        /**
+         * 3、通过isRequest判断表格是否进行加载，用于后续业务逻辑扩展
+         */
         this.tableConfig.isRequest && this.loadTableData();
       },
 
       // 加载表格数据
       loadTableData () {
         this.loading = true;
+        // 请求参数处理
         let requestData = {
-          url: this.tableConfig.apiUrl,
-          data: this.tableConfig.params,
+          url: this.tableConfig.apiUrl, // api请求接口
+          data: this.tableConfig.params, // 请求参数
         }
         GetTableData(requestData).then(res => {
           let data = res.data.data;
@@ -165,11 +186,14 @@
         this.loadTableData();
       },
 
+      // 切换每页条数
       handleSizeChange (val) {
         // console.log(`每页 ${val} 条`);
         this.tableConfig.params.pageSize = val;
         this.loadTableData();
       },
+
+      // 切换当前页码
       handleCurrentChange (val) {
         // console.log(`当前页: ${val}`);
         this.tableConfig.params.pageNumber = val;

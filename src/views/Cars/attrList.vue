@@ -1,11 +1,18 @@
+<!--
+ * @Description: 车辆属性
+ * @Author: wh
+ * @Date: 2022-07-12 09:11:56
+ * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2022-07-12 10:04:45
+-->
 <template>
   <div>
     <div class="parking-search-form">
       <!-- table组件 -->
       <TableComponent ref="tsbleDataRef" :config="tableConfig">
-        <!-- 车辆属性 -->
+        <!-- 车辆属性 TODO: 点击车辆属性前，表格不能让其加载 -->
         <template v-slot:attrsList>
-          <el-button style="margin-bottom: 20px" size="small" :type=" item.id === attrId ? 'primary' : ''" v-for="(item, index) in attrs" :key="index" @click="getAttrId(item)">{{ item.value }}</el-button>
+          <el-button style="margin-bottom: 20px" size="small" :type=" item.id === attrId ? 'primary' : ''" v-for="(item, index) in attrs" :key="index" @click="handleAttrs(item)">{{ item.value }}</el-button>
         </template>
       </TableComponent>
     </div>
@@ -14,30 +21,23 @@
 
 <script>
   import { GetCarAttrs, GetCustomAttrs } from "@/api/carAttrs"
-  import CityArea from "@/components/CityArea"
   import TableComponent from "@/components/TableComponent"
   export default {
-    name: "Cars",
-    components: {
-      CityArea,
-      TableComponent
-    },
+    name: "CarAttrs",
+    components: { TableComponent },
     data () {
       return {
-
         // 车辆属性
         attrs: [],
         // 属性id
         attrId: '',
+        // 自定义属性
+        customAttrs: [],
         // 当前行的ID
         rowId: "",
-        // 控制禁启用防抖节流
-        disableStatusId: "",
-        pageNumber: 1,
-        pageSize: 2,
         // 表格数据配置
         tableConfig: {
-          // 是否加载表格
+          // 是否加载表格(点击车辆属性前，表格不能让其加载，只有点击了属性才进行表格加载)
           isRequest: false,
 
           // 是否显示表格搜索
@@ -87,18 +87,21 @@
       getCarAttrs () {
         GetCarAttrs().then(res => {
           const data = res.data.data.data;
+          // 防止后端返回的data可能为null
           data && (this.attrs = data);
         })
       },
-      // 存id
-      getAttrId ({ id }) {
+      // 点击车辆属性(顶级)
+      handleAttrs ({ id }) {
+        // 存id
         this.attrId = id;
         this.getCustomAttrs();
       },
       // 车辆自定义属性列表
       getCustomAttrs () {
         GetCustomAttrs({ typeId: this.attrId }).then(res => {
-					
+          const data = res.data.data;
+          data && (this.customAttrs = data);
         })
       }
     }
